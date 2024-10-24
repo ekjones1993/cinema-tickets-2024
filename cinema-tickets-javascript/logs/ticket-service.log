@@ -1,0 +1,4 @@
+2024-10-24T20:47:44.807Z [info] [sessionId: 9b1a19c3-8a21-406a-a532-4d5b38e8dfbc] Starting ticket purchase process {"sessionId":"9b1a19c3-8a21-406a-a532-4d5b38e8dfbc","ticketTypeRequests":[]}
+2024-10-24T20:53:30.760Z [info] [sessionId: 189123e8-bb39-4f8b-b7b4-4f1dd8c81072] Starting ticket purchase process {"sessionId":"189123e8-bb39-4f8b-b7b4-4f1dd8c81072","ticketTypeRequests":[]}
+2024-10-24T20:53:30.763Z [error] [sessionId: 189123e8-bb39-4f8b-b7b4-4f1dd8c81072] Invalid account ID {"error":"Invalid account ID"}
+2024-10-24T20:53:30.763Z [error] [sessionId: 189123e8-bb39-4f8b-b7b4-4f1dd8c81072] Ticket purchase failed {"error":"Invalid account ID"}
