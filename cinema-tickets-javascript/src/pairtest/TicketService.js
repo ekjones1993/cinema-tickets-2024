@@ -1,6 +1,9 @@
 import TicketTypeRequest from './lib/TicketTypeRequest.js';
 import InvalidPurchaseException from './lib/InvalidPurchaseException.js';
-import { accountIDValidation } from './lib/validation.js';
+import {
+  accountIDValidation,
+  ticketTypeRequestsValidation,
+} from './lib/validation.js';
 import { v4 as uuidv4 } from 'uuid'; // Import UUID for generating session ID
 import logger, { setSessionId } from './lib/logger.js';
 
@@ -21,8 +24,9 @@ export default class TicketService {
 
     try {
       this.#validateAccount(accountId);
+      this.#validateTicketRequests(ticketTypeRequests);
     } catch (error) {
-      logger.error('Ticket purchase failed', { error: error.message });
+      logger.error('PURCHASE_TICKETS_ERROR:', { error: error.message });
       throw new InvalidPurchaseException(error.message);
     }
   }
@@ -30,8 +34,19 @@ export default class TicketService {
   #validateAccount(accountId) {
     const accountIDError = accountIDValidation(accountId);
     if (accountIDError) {
-      logger.error('Invalid account ID', { error: accountIDError });
+      logger.error('ACCOUNT_ID_ERROR:', { error: accountIDError });
       throw new InvalidPurchaseException(accountIDError);
+    }
+  }
+
+  #validateTicketRequests(ticketTypeRequests) {
+    const ticketTypeRequestError =
+      ticketTypeRequestsValidation(ticketTypeRequests);
+    if (ticketTypeRequestError) {
+      logger.error('TICKET_TYPE_REQUEST_ERROR:', {
+        error: ticketTypeRequestError,
+      });
+      throw new InvalidPurchaseException(ticketTypeRequestError);
     }
   }
 }

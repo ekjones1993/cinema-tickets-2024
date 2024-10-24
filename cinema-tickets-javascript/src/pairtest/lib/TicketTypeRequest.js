@@ -1,3 +1,4 @@
+import { TICKET_CONFIG } from '../data/ticketConfig';
 /**
  * Immutable Object.
  */
@@ -8,9 +9,10 @@ export default class TicketTypeRequest {
   #noOfTickets;
 
   constructor(type, noOfTickets) {
-    if (!this.#Type.includes(type)) {
+    // See if type exists as a key in the TICKET_CONFIG
+    if (!(type in TICKET_CONFIG)) {
       throw new TypeError(
-        `type must be ${this.#Type.slice(0, -1).join(', ')}, or ${this.#Type.slice(-1)}`
+        `type must be one of: ${Object.keys(TICKET_CONFIG).join(', ')}`
       );
     }
 
@@ -29,6 +31,4 @@ export default class TicketTypeRequest {
   getTicketType() {
     return this.#type;
   }
-
-  #Type = ['ADULT', 'CHILD', 'INFANT'];
 }
