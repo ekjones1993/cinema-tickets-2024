@@ -3,7 +3,9 @@ import InvalidPurchaseException from './lib/InvalidPurchaseException.js';
 import {
   accountIDValidation,
   ticketTypeRequestsValidation,
+  ticketTypeQuantitiesValidation,
 } from './lib/validation.js';
+import { sortTicketTypeQuantities } from './lib/ticketTypeQuantities.js';
 import { v4 as uuidv4 } from 'uuid'; // Import UUID for generating session ID
 import logger, { setSessionId } from './lib/logger.js';
 
@@ -25,6 +27,8 @@ export default class TicketService {
     try {
       this.#validateAccount(accountId);
       this.#validateTicketRequests(ticketTypeRequests);
+      const ticketTypeQuantities = sortTicketTypeQuantities(ticketTypeRequests);
+      this.#validateTicketQuantities(ticketTypeQuantities);
     } catch (error) {
       logger.error('PURCHASE_TICKETS_ERROR:', { error: error.message });
       throw new InvalidPurchaseException(error.message);
@@ -47,6 +51,17 @@ export default class TicketService {
         error: ticketTypeRequestError,
       });
       throw new InvalidPurchaseException(ticketTypeRequestError);
+    }
+  }
+
+  #validateTicketQuantities(ticketTypeQuantities) {
+    const ticketTypeQuantitiesError =
+      ticketTypeQuantitiesValidation(ticketTypeQuantities);
+    if (ticketTypeQuantitiesError) {
+      logger.error('TICKET_TYPE_QUANTITIES_ERROR:', {
+        error: ticketTypeQuantitiesError,
+      });
+      throw new InvalidPurchaseException(ticketTypeQuantitiesError);
     }
   }
 }
