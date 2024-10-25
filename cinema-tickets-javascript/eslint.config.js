@@ -46,6 +46,6 @@ export default defineConfig([
     languageOptions: { sourceType: 'module' },
   },
   {
-    ignores: ['node_modules/**/*', 'tests/unit/*'],
+    ignores: ['node_modules/**/*', 'test/**/*'],
   },
 ]);

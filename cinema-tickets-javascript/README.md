@@ -1,75 +1,54 @@
-Instructions:
+# Cinema Ticket Booking System
 
-# Objective
+## Business Rules Addressed
 
-This is a coding exercise which will allow you to demonstrate how you code and your approach to a given problem.
+My solution follows these key business rules:
 
-You will be assessed on:
+- **Ticket Types**:
 
-- Your ability to write clean, well-tested and reusable code.
+  - **Infant**: £0 (no seat allocated, sits on an adult's lap).
+  - **Child**: £15 (must be bought with at least one adult ticket).
+  - **Adult**: £25
 
-- How you have ensured the following business rules are correctly met.
+- **Purchase Logic**:
 
-# Business Rules
+  - Users can buy multiple tickets in a single transaction.
+  - Maximum of 25 tickets can be bought.
+  - If Child or Infant tickets are requested, there must be an Adult ticket included.
 
-- There are 3 types of tickets i.e. Infant, Child, and Adult.
+- **Payment and Reservation**:
 
-- The ticket prices are based on the type of ticket (see table below).
+  - Utilises the existing `TicketPaymentService` to process payments.
+  - Uses the `SeatReservationService` to reserve seats for Adult and Child tickets only.
 
-- The ticket purchaser declares how many and what type of tickets they want to buy.
+- **Validation**: In my solution, the system validates account IDs and ticket requests, throwing exceptions for any invalid inputs. By incorporating "fail fast" principles, my solution will quickly identify and address issues early in the user journey, preventing further problems.
 
-- Multiple tickets can be purchased at any given time.
+## Dynamic Design
 
-- Only a maximum of 25 tickets that can be purchased at a time.
+I have developed my solution to be adaptable, making it easy for new ticket types to be encorporated in the future, such as student tickets.
 
-- Infants do not pay for a ticket and are not allocated a seat. They will be sitting on an Adult's lap.
+- **Flexible Ticket Configuration**: Ticket types and prices are managed through a configuration object (TICKET_CONFIG), allowing for quick adjustments without the need for major code changes.
 
-- Child and Infant tickets cannot be purchased without purchasing an Adult ticket.
+- **Dynamic Ticket Quantity Handling**: The ticket sorting logic can easily adapt to new ticket types, ensuring the system remains maintainable.
 
-| Ticket Type | Price |
+## Code Quality
 
-| ---------------- | ----------- |
+I have tried to make sure the code I have written is clean and readable by using:
 
-| INFANT | £0 |
+- **ESLint and Prettier**: Which I have configured to use the DWP ESLint package alongside Prettier for consistent code style and quality. This is to ensures that code remains readable and adheres to best practices.
 
-| CHILD | £15 |
+## Logging
 
-| ADULT | £25 |
+Logging is handled by the Winston library, which helps track the user journey through the system:
 
-- There is an existing `TicketPaymentService` responsible for taking payments.
+- **Session IDs**: Each log entry includes a session ID to maintain privacy and improve traceability.
+- **Error Logging**: The system logs any errors or invalid purchase attempts, which helps to monitor and debug any issues.
 
-- There is an existing `SeatReservationService` responsible for reserving seats.
+## Run Instructions
 
-## Constraints
-
-- The TicketService interface CANNOT be modified.
-
-- The code in the thirdparty.\* packages CANNOT be modified.
-
-- The `TicketTypeRequest` MUST be an immutable object.
-
-## Assumptions
-
-You can assume:
-
-- All accounts with an id greater than zero are valid. They also have sufficient funds to pay for any no of tickets.
-
-- The `TicketPaymentService` implementation is an external provider with no defects. You do not need to worry about how the actual payment happens.
-
-- The payment will always go through once a payment request has been made to the `TicketPaymentService`.
-
-- The `SeatReservationService` implementation is an external provider with no defects. You do not need to worry about how the seat reservation algorithm works.
-
-- The seat will always be reserved once a reservation request has been made to the `SeatReservationService`.
-
-## Your Task
-
-Provide a working implementation of a `TicketService` that:
-
-- Considers the above objective, business rules, constraints & assumptions.
-
-- Calculates the correct amount for the requested tickets and makes a payment request to the `TicketPaymentService`.
-
-- Calculates the correct no of seats to reserve and makes a seat reservation request to the `SeatReservationService`.
-
-- Rejects any invalid ticket purchase requests. It is up to you to identify what should be deemed as an invalid purchase request.”
+```bash
+nvm use
+nvm install
+npm install
+npm test
+```

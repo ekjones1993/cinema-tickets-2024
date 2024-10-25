@@ -1,9 +1,8 @@
-// src/lib/logger.js
 import winston from 'winston';
 
-let sessionId = null; // Holds the sessionId for current logging context
+let sessionId = null;
 
-// Function to set the sessionId for logging context
+// Set sessionId for logging context
 export const setSessionId = (newSessionId) => {
   sessionId = newSessionId;
 };
@@ -18,10 +17,7 @@ const logger = winston.createLogger({
       return `${timestamp} [${level}] [sessionId: ${sessionId}] ${message} ${JSON.stringify(meta)}`;
     })
   ),
-  transports: [
-    new winston.transports.Console(),
-    new winston.transports.File({ filename: 'logs/ticket-service.log' }),
-  ],
+  transports: [new winston.transports.Console()],
 });
 
 export default logger;
