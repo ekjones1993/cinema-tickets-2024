@@ -47,8 +47,8 @@ Logging is handled by the Winston library, which helps track the user journey th
 ## Run Instructions
 
 ```bash
-nvm use
 nvm install
+nvm use
 npm install
 npm test
 ```

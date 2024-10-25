@@ -3,40 +3,46 @@ import SeatReservationService from '../../src/thirdparty/seatbooking/SeatReserva
 import TicketPaymentService from '../../src/thirdparty/paymentgateway/TicketPaymentService';
 import {
   accountIDValidation,
-  ticketTypeRequestsValidation,
   ticketTypeQuantitiesValidation,
 } from './lib/validation.js';
 import { TICKET_CONFIG } from './data/ticketConfig.js';
-import { sortTicketTypeQuantities } from './lib/ticketTypeQuantities.js';
-import { v4 as uuidv4 } from 'uuid'; // Import UUID for generating session ID
+import { v4 as uuidv4 } from 'uuid';
 import logger, { setSessionId } from './lib/logger.js';
+import TicketTypeRequest from './lib/TicketTypeRequest';
 
 export default class TicketService {
-  /**
-   * Should only have private methods other than the one below.
-   */
   constructor() {
-    this.sessionId = uuidv4(); // Generate a unique session ID
-    setSessionId(this.sessionId); // Set the session ID for logger
+    this.sessionId = uuidv4(); // Generate unique session ID
+    setSessionId(this.sessionId); // Set session ID for logger
   }
 
-  purchaseTickets(accountId, ...ticketTypeRequests) {
+  purchaseTickets(accountId, ticketTypeRequests) {
     logger.info('Starting ticket purchase process', {
       sessionId: this.sessionId,
       ticketTypeRequests,
     });
 
     try {
-      // Validate and sort inputs
+      // Validate account ID
       this.#validateAccount(accountId);
-      this.#validateTicketRequests(ticketTypeRequests);
-      const ticketTypeQuantities = sortTicketTypeQuantities(ticketTypeRequests);
+
+      // Turn input objects into TicketTypeRequest instances
+      const ticketTypeRequestsInstances =
+        this.#createTicketTypeRequests(ticketTypeRequests);
+
+      // Turn TicketTypeRequest instances into ticketTypeQuantities
+      const ticketTypeQuantities = this.#processTicketRequests(
+        ticketTypeRequestsInstances
+      );
+
+      // Validate ticket quantities
       this.#validateTicketQuantities(ticketTypeQuantities);
 
       // Calculate seats and total cost
       const totalNumSeats = this.#calculateTotalSeats(ticketTypeQuantities);
       const totalTicketCost =
         this.#calculateTotalTicketCost(ticketTypeQuantities);
+
       logger.info('Calculated total seats and cost', {
         totalNumSeats,
         totalTicketCost,
@@ -70,15 +76,35 @@ export default class TicketService {
     }
   }
 
-  #validateTicketRequests(ticketTypeRequests) {
-    const ticketTypeRequestError =
-      ticketTypeRequestsValidation(ticketTypeRequests);
-    if (ticketTypeRequestError) {
-      logger.error('TICKET_TYPE_REQUEST_ERROR:', {
-        error: ticketTypeRequestError,
-      });
-      throw new InvalidPurchaseException(ticketTypeRequestError);
-    }
+  #createTicketTypeRequests(ticketTypeRequests) {
+    return ticketTypeRequests.map(({ type, noOfTickets }) => {
+      try {
+        return new TicketTypeRequest(type, noOfTickets);
+      } catch (error) {
+        logger.error('TICKET_TYPE_REQUEST_CREATION_ERROR', {
+          type,
+          noOfTickets,
+          error: error.message,
+        });
+        throw new InvalidPurchaseException(
+          `Invalid ticket type request: ${error.message}`
+        );
+      }
+    });
+  }
+
+  #processTicketRequests(ticketTypeRequestsInstances) {
+    return ticketTypeRequestsInstances.reduce((quantities, request) => {
+      const type = request.getTicketType();
+      const noOfTickets = request.getNoOfTickets();
+
+      if (!quantities[type]) {
+        quantities[type] = 0;
+      }
+
+      quantities[type] += noOfTickets;
+      return quantities;
+    }, {});
   }
 
   #validateTicketQuantities(ticketTypeQuantities) {
