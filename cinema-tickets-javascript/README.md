@@ -52,3 +52,10 @@ nvm use
 npm install
 npm test
 ```
+
+## Debugging
+I have been made aware that during npm install it is sometimes erroring. If you get a "npm ERR! notarget No matching version found for cross-spawn@^7.0.5." error when trying to install, please run the following before running the above commands:
+```bash
+npm cache clean --force
+npm install
+```
